@@ -20,12 +20,11 @@ export class AppComponent implements OnInit {
     private modalService: BsModalService) { }
 
   ngOnInit() {
-    this.toastr.success('The Sample' + this.operationName + ' has been successfully completed!', '', {
-      disableTimeOut: true
-    });    
+    this.successexpression = '';
   }
 
   openConditionbuilder() {
+    this.successexpression = '';
     this.modalRef = this.modalService.show(ConditionBuilderComponent, {
       ariaDescribedby: 'condition builder',
       ariaLabelledBy: 'Condition Builder',
@@ -33,13 +32,20 @@ export class AppComponent implements OnInit {
     });
     this.modalRef.content.onClose.subscribe(result => {
       console.log('results', JSON.stringify(result));
-      this.successexpression = JSON.stringify(result);
-
-      setTimeout( () => {
-        this.toastr.success('The Sample' + this.operationName + ' has been successfully completed!', '', {
-          disableTimeOut: true
+      if (result) {
+        let successexpression = '';
+        Object.keys(result).forEach(res => {
+          result['rules'].forEach(ele => {
+            successexpression += result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' +  ' ';        
+          });          
         });
-      }, 1000);      
+        this.successexpression = successexpression;
+        setTimeout(() => {
+          this.toastr.success('The Sample' + this.operationName + ' has been successfully completed!', '', {
+            timeOut: 3000
+          });
+        }, 1000);
+      }
     });
   }
 

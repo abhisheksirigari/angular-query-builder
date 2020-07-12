@@ -16,8 +16,6 @@
 
 <div class="content" role="main">
 
-
-
   <div class="modal-content">
     <div class="modal-header">
       <h5 class="modal-title w-100">
@@ -46,7 +44,9 @@
               <button class="btn btn-primary float-right btn-sm" (click)="openConditionbuilder()">Condition builder</button>
 
               <textarea [(ngModel)]="successexpression" class="form-control mt-1" id="successexpressionInput" rows="3"
-                aria-describedby="successexpressionHelp"></textarea>
+              placeholder="success(command_operation_1)and failure(command_operation_2)"
+                aria-describedby="successexpressionHelp">
+              </textarea>
               <small id="successexpressionHelp" class="form-text text-muted d-none">Success logical expression.</small>
 
             </div>

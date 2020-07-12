@@ -13,7 +13,6 @@ export class ConditionBuilderComponent implements OnInit {
   public onClose: Subject<any>;
   logicalexpression: any;
 
-
   objectKeys = Object.keys;
   public queryCtrl: FormControl;
   public currentConfig: QueryBuilderConfig;
@@ -23,8 +22,8 @@ export class ConditionBuilderComponent implements OnInit {
   public query = {
     condition: 'and',
     rules: [
-      { field: 'age', subtype: 'age',  operator: '<=', entity: 'physical' },
-      { field: 'birthday', operator: '=', value: '', entity: 'nonphysical' }      
+      { field: "statusdependency", subtype: "none", operator: "success", value: "sample_oprA" },
+      { field: "statusdependency", subtype: "none", operator: "failure", value: "sample_oprB" }
     ]
   };
 
@@ -32,34 +31,26 @@ export class ConditionBuilderComponent implements OnInit {
 
   public config: QueryBuilderConfig = {
     fields: {
-      age: {name: 'Age', type: 'number'},
-      gender: {
-        name: 'Gender',
+      statusdependency: {
+        name: 'Status dependency',
         type: 'category',
+        operators: ['success', 'failure', 'exitcode'],
         options: [
-          {name: 'Male', value: 'm'},
-          {name: 'Female', value: 'f'}
+          {name: 'sample_oprA', value: 'sample_oprA'},
+          {name: 'sample_oprB', value: 'sample_oprB'}
         ]
       },
-      name: {name: 'Name', type: 'string'},
-      notes: {name: 'Notes', type: 'textarea', operators: ['=', '!=']},
-      educated: {name: 'College Degree?', type: 'boolean'},
-      birthday: {name: 'Birthday', type: 'date', operators: ['=', '<=', '>']        
-      },
-      school: {name: 'School', type: 'string', nullable: true},
-      occupation: {
-        name: 'Occupation',
+      exitcodedependency: {
+        name: 'Exit code dependency',
         type: 'category',
+        operators: ['success', 'failure', 'exitcode'],
         options: [
-          {name: 'Student', value: 'student'},
-          {name: 'Teacher', value: 'teacher'},
-          {name: 'Unemployed', value: 'unemployed'},
-          {name: 'Scientist', value: 'scientist'}
+          {name: 'sample_oprA', value: 'sample_oprA'},
+          {name: 'sample_oprB', value: 'sample_oprB'}
         ]
       }
     }
   };
-  
 
   constructor(
     private formBuilder: FormBuilder,

@@ -1,8 +1,9 @@
-<span>{{query.condition}}</span>
+<span> {{query.condition}} </span>
 
-<ng-container *ngFor="let r of query.rules">
+<ng-container *ngFor="let r of query.rules">	
 	<span *ngIf="!r.condition && (r.value || r.operator.includes('null'))" color="primary" selected>
-		{{ r.field }} {{ r.operator }} {{ r.value }}
+		<!-- {{ r.field }} {{ r.operator }} {{ r.value }} -->
+		{{ r.operator }}( {{ r.value }} )
 	</span>
 	<app-query *ngIf="r.condition" [query]="r"></app-query>
 </ng-container>

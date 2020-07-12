@@ -12,16 +12,15 @@
         <app-query [query]="query"></app-query>
       </div>
       <!-- <div class="form-group">
-        <label for="logicalexpressionInput">logical expression</label>
-        <textarea class="output">{{query | json}}</textarea>
+        <label for="logicalexpressionInput" class="d-block">logical expression</label>
+        <textarea class="form-control w-100">{{query | json}}</textarea>
       </div> -->
     </div>
   </div>
 
   <div ngNoForm>
-    <query-builder id="triggerQuery" 
-    [(ngModel)]="query" [config]="config"
-    [allowRuleset]="allowRuleset" [allowCollapse]="allowCollapse">
+    <query-builder id="triggerQuery" [(ngModel)]="query" [config]="config" [allowRuleset]="allowRuleset"
+      [allowCollapse]="allowCollapse">
       <ng-container
         *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
         <div class="btn-group" style="margin-left: 50px;">
@@ -31,44 +30,59 @@
             Delete</button>
         </div>
       </ng-container>
-      <ng-container *queryRemoveButton="let rule; let removeRule=removeRule"> 
+      <ng-container *queryRemoveButton="let rule; let removeRule=removeRule">
         <button class="btn btn-outline-primary btn-sm" (click)="$event.preventDefault();removeRule(rule)">
-          <i class="fa fa-trash" aria-hidden="true"></i></button>        
+          <i class="fa fa-trash" aria-hidden="true"></i></button>
       </ng-container>
 
       <ng-container *queryField="let rule; let fields=fields; let changeField=changeField">
-        <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.field"
-          (input)="onQueryChanged($event, rule)" required>
-          <option *ngFor="let field of fields" [ngValue]="field.value">
-            {{field.name}}
-          </option>
-        </select>
-      </ng-container>
+        <!-- {{rule | json}} -->
 
-      <ng-container *queryField="let rule; let fields=fields; let changeField=changeField">
-        <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.field"
-          (input)="onQueryChanged($event, rule)" required>
-          <option *ngFor="let field of fields" [ngValue]="field.value">
-            {{field.name}}
-          </option>
-        </select>
+        <div class="form-col">
+          <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.subtype"
+            (input)="onQueryChanged($event, rule)" required id="typeInput" aria-describedby="subtypeHelp">
+            <option *ngFor="let field of fields" [ngValue]="field.value">
+              {{field.name}}
+            </option>
+          </select>
+          <small id="subtypeHelp" class="form-text text-muted d-none">enter subtypeHelp.</small>
+        </div>
+
+        <div class="form-col">
+          <!-- <label for="typeInput">Type</label><br> -->
+          <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.field"
+            (input)="onQueryChanged($event, rule)" required id="typeInput" aria-describedby="typeHelp">
+            <option *ngFor="let field of fields" [ngValue]="field.value">
+              {{field.name}}
+            </option>
+          </select>
+          <small id="typeHelp" class="form-text text-muted d-none">enter type.</small>
+        </div>        
+
       </ng-container>
 
       <ng-container *queryOperator="let rule; let operators=operators">
-        <select id="alertOperatorSelection" class="form-control" [(ngModel)]="rule.operator"
-          (input)="onQueryChanged($event, rule)" required>
-          <option *ngFor="let value of operators" [ngValue]="value">
-            {{value}}
-          </option>
-        </select>
+        <div class="form-col">
+          <!-- <label for="typeInput">operation name</label><br> -->
+          <select id="alertOperatorSelection" class="form-control" [(ngModel)]="rule.operator"
+            (input)="onQueryChanged($event, rule)" required>
+            <option *ngFor="let value of operators" [ngValue]="value">
+              {{value}}
+            </option>
+          </select>
+        </div>
+
       </ng-container>
 
       <ng-container *queryInput="let rule; type: 'string'">
-        <input type="text" id="alertValue" class="form-control" [(ngModel)]="rule.value"
-          (input)="onQueryChanged($event, rule)" required>
+        <div class="form-col">
+          <!-- <label for="typeInput">status</label><br> -->
+          <input type="text" id="alertValue" class="form-control" [(ngModel)]="rule.value"
+            (input)="onQueryChanged($event, rule)" required>
+        </div>
       </ng-container>
 
-      
+
     </query-builder>
 
 
