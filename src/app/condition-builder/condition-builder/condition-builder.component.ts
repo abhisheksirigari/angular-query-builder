@@ -18,12 +18,13 @@ export class ConditionBuilderComponent implements OnInit {
   public currentConfig: QueryBuilderConfig;
   public allowRuleset: boolean = true;
   public allowCollapse: boolean = true;
+  isexitcode = false;
+  isAddFields = false;
 
   public query = {
     condition: 'and',
     rules: [
-      { field: "statusdependency", subtype: "none", operator: "success", value: "sample_oprA" },
-      { field: "statusdependency", subtype: "none", operator: "failure", value: "sample_oprB" }
+      { subtype: "statusdependency", field: "none", operator: "success", value: "sample_oprA", fields: [] }
     ]
   };
 
@@ -31,22 +32,22 @@ export class ConditionBuilderComponent implements OnInit {
 
   public config: QueryBuilderConfig = {
     fields: {
-      statusdependency: {
-        name: 'Status dependency',
+      none: {
+        name: 'None',
         type: 'category',
-        operators: ['success', 'failure', 'exitcode'],
+        operators: ['success', 'failure', 'exitcode', 'notrunning', 'terminated'],
         options: [
-          {name: 'sample_oprA', value: 'sample_oprA'},
-          {name: 'sample_oprB', value: 'sample_oprB'}
+          { name: 'sample_oprA', value: 'sample_oprA' },
+          { name: 'sample_oprB', value: 'sample_oprB' }
         ]
       },
-      exitcodedependency: {
-        name: 'Exit code dependency',
+      lookback: {
+        name: 'Lookback',
         type: 'category',
-        operators: ['success', 'failure', 'exitcode'],
+        operators: ['success', 'failure', 'exitcode', 'notrunning', 'terminated'],
         options: [
-          {name: 'sample_oprA', value: 'sample_oprA'},
-          {name: 'sample_oprB', value: 'sample_oprB'}
+          { name: 'sample_oprA', value: 'sample_oprA' },
+          { name: 'sample_oprB', value: 'sample_oprB' }
         ]
       }
     }
@@ -74,8 +75,57 @@ export class ConditionBuilderComponent implements OnInit {
     this._bsModalRef.hide();
   }
 
-  onQueryChanged(e: any, rule: any): void {
+  onQueryChanged(e: any, rule: any) {
     console.log(e, rule);
+    this.isexitcode = rule.operator === 'exitcode' ? !this.isexitcode : false;
+    if (rule.field == 'lookback' && rule.operator == 'failure') {
+      this.isAddFields = true;
+      rule.fields = [
+        {
+          name: 'Look back',
+          field: 'lookback',
+          type: 'number',
+          value: '01'
+        },
+        {
+          name: '',
+          field: 'lookbackmm',
+          type: 'number',
+          value: '00'
+        }
+      ] 
+    }
+    if (rule.field == 'lookback' && rule.operator == 'exitcode') {
+      this.isAddFields = true;
+      rule.fields = [
+        {
+          name: 'Operator',
+          field: 'operator',
+          type: 'category',
+          operators: ['=', '<=', '>', '>='],
+          value: ''
+        },
+        {
+          name: 'Value',
+          field: 'value',
+          type: 'string',
+          value: '4'
+        },
+        {
+          name: 'Look back',
+          field: 'lookback',
+          type: 'number',
+          value: '20'
+        },
+        {
+          name: '',
+          field: 'lookbackmm',
+          type: 'number',
+          value: '01'
+        }
+      ] 
+    }
+
     // const control = this.parentFormGroup.controls['triggerQuery'];
     // if (rule.field && rule.operator && rule.value) {
     //   control.setErrors(null);

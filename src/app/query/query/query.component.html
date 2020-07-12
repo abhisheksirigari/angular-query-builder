@@ -1,9 +1,21 @@
-<span> {{query.condition}} </span>
 
-<ng-container *ngFor="let r of query.rules">	
-	<span *ngIf="!r.condition && (r.value || r.operator.includes('null'))" color="primary" selected>
+<ng-container *ngFor="let r of query.rules; let idx = index">	
+	(<span *ngIf="!r.condition && (r.value || r.operator.includes('null'))" color="primary" selected>
 		<!-- {{ r.field }} {{ r.operator }} {{ r.value }} -->
-		{{ r.operator }}( {{ r.value }} )
+		{{ r.operator }} ( {{ r.value }}
+		<span *ngFor="let f of r.fields; let sidx = index">
+			<span *ngIf="f.field == 'lookback' || f.field == 'lookbackmm'"> {{f.value}} </span>
+			<span *ngIf="sidx != (r.fields.length-1)">,</span>
+		</span> ) 		
+
+		<span *ngIf="idx != 0 || idx != (query.rules.length-1)">,</span>
+
+		<span *ngFor="let f of r.fields; let ssidx = index"> 
+			<span *ngIf="f.field == 'operator' || f.field == 'value'"> {{f.value}} </span>
+			<span *ngIf="ssidx != (r.fields.length-1)">,</span>
+		</span>
+		
 	</span>
-	<app-query *ngIf="r.condition" [query]="r"></app-query>
+	<app-query *ngIf="r.condition" [query]="r"></app-query> ) 
+	<span *ngIf="query.rules.length > 1"> {{query.condition}} </span> 
 </ng-container>

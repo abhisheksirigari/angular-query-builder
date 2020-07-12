@@ -26,38 +26,49 @@
     <div class="modal-body">
       <div class="card-body">
 
-        <div class="row">
-          <div class="col-6">
-            <div class="form-group">
-              <label for="operationNameInput">Operation name</label>
-              <input [(ngModel)]="operationName" type="text" class="form-control" id="operationNameInput"
-                aria-describedby="operationNameHelp" placeholder="">
-              <small id="operationNameHelp" class="form-text text-muted d-none">Enter your operational name.</small>
+        <form [formGroup]="querybuilderForm" (ngSubmit)="save()">
+
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="operationNameInput">Operation name</label>
+                <span class="text-danger">*</span>
+                <input [(ngModel)]="operationName" type="text" class="form-control" id="operationNameInput"
+                  formControlName="operName"
+                  [ngClass]="{ 'is-invalid': submitted && f.operName.errors }"
+                  aria-describedby="operationNameHelp" placeholder="">
+                <small id="operationNameHelp" class="form-text text-muted d-none">Enter your operational name.</small>
+              </div>
+              <div *ngIf="submitted && f.operName.errors" class="invalid-feedback">
+                <div *ngIf="f.operName.errors.required">operation Name is required</div>
+            </div>
             </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="col-12">
-            <div class="form-group">
-              <label for="successexpressionInput">Success logical expression</label>
-              <button class="btn btn-primary float-right btn-sm" (click)="openConditionbuilder()">Condition builder</button>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="successexpressionInput">Success logical expression</label>
+                <button class="btn btn-primary float-right btn-sm" (click)="openConditionbuilder()">Condition
+                  builder</button>
 
-              <textarea [(ngModel)]="successexpression" class="form-control mt-1" id="successexpressionInput" rows="3"
-              placeholder="success(command_operation_1)and failure(command_operation_2)"
-                aria-describedby="successexpressionHelp">
+                <textarea [(ngModel)]="successexpression" class="form-control mt-1" id="successexpressionInput" rows="3"
+                  placeholder="success(command_operation_1)and failure(command_operation_2)"
+                  aria-describedby="successexpressionHelp" formControlName="expression">
               </textarea>
-              <small id="successexpressionHelp" class="form-text text-muted d-none">Success logical expression.</small>
+                <small id="successexpressionHelp" class="form-text text-muted d-none">Success logical
+                  expression.</small>
 
+              </div>
             </div>
           </div>
-        </div>
-
+        
+        </form>
       </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+      <button [disabled]="querybuilderForm.invalid" type="submit" class="btn btn-primary" (click)="save()">Save</button>
     </div>
   </div>
 

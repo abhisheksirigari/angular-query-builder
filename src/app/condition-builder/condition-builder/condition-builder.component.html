@@ -18,7 +18,7 @@
     </div>
   </div>
 
-  <div ngNoForm>
+  <div class="querybuilder" ngNoForm>
     <query-builder id="triggerQuery" [(ngModel)]="query" [config]="config" [allowRuleset]="allowRuleset"
       [allowCollapse]="allowCollapse">
       <ng-container
@@ -39,49 +39,84 @@
         <!-- {{rule | json}} -->
 
         <div class="form-col">
-          <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.subtype"
-            (input)="onQueryChanged($event, rule)" required id="typeInput" aria-describedby="subtypeHelp">
-            <option *ngFor="let field of fields" [ngValue]="field.value">
-              {{field.name}}
-            </option>
+          <label for="typeInput">Type</label><br>
+          <select class="form-control" [(ngModel)]="rule.subtype" required id="subtypeInput"
+            aria-describedby="subtypeHelp">
+            <option value="statusdependency" selected>Status dependency</option>
+            <option value="exitcodedependency">Exit Code dependency</option>
           </select>
           <small id="subtypeHelp" class="form-text text-muted d-none">enter subtypeHelp.</small>
-        </div>
 
+        </div>
         <div class="form-col">
-          <!-- <label for="typeInput">Type</label><br> -->
+          <label for="typeInput">Subtype</label><br>
           <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.field"
-            (input)="onQueryChanged($event, rule)" required id="typeInput" aria-describedby="typeHelp">
+            (ngModelChange)="onQueryChanged($event, rule)" required id="fieldInput" aria-describedby="typeHelp">
             <option *ngFor="let field of fields" [ngValue]="field.value">
               {{field.name}}
             </option>
           </select>
-          <small id="typeHelp" class="form-text text-muted d-none">enter type.</small>
-        </div>        
+          <small id="fieldInput" class="form-text text-muted d-none">enter type.</small>
+        </div>
+
+
+
+
 
       </ng-container>
 
       <ng-container *queryOperator="let rule; let operators=operators">
         <div class="form-col">
-          <!-- <label for="typeInput">operation name</label><br> -->
+          <label for="typeInput">status</label><br>
           <select id="alertOperatorSelection" class="form-control" [(ngModel)]="rule.operator"
-            (input)="onQueryChanged($event, rule)" required>
+            [ngClass]="{'exitcode': isexitcode}" (ngModelChange)="onQueryChanged($event, rule)" required
+            aria-describedby="statusHelp">
             <option *ngFor="let value of operators" [ngValue]="value">
               {{value}}
             </option>
           </select>
+          <small id="statusHelp" class="form-text text-muted d-none">enter status</small>
         </div>
-
       </ng-container>
 
       <ng-container *queryInput="let rule; type: 'string'">
+
         <div class="form-col">
-          <!-- <label for="typeInput">status</label><br> -->
+          <label for="typeInput">operation names</label><br>
           <input type="text" id="alertValue" class="form-control" [(ngModel)]="rule.value"
-            (input)="onQueryChanged($event, rule)" required>
+            (ngModelChange)="onQueryChanged($event, rule)" required>
         </div>
       </ng-container>
 
+      <ng-container *queryInput="let rule; let fields=fields; let field=field; let options=options; type: 'category'">
+        
+        <div class="form-col">
+          <label for="typeInput">operation name</label><br>
+          <select [(ngModel)]="rule.value" class="form-control" (ngModelChange)="onQueryChanged($event, rule)">
+            <option *ngFor="let opt of options" [value]="opt.value">
+              {{ opt.name }}
+            </option>
+          </select>
+        </div>
+        <br *ngIf="isAddFields">
+        <div class="form-col form-col-inner" *ngFor="let rule of rule.fields;">
+          <label for="typeInput">{{rule.name}}</label><br>
+          <input *ngIf="rule.type == 'string'" type="text" id="alertValue" class="form-control w-60px" [(ngModel)]="rule.value"
+            (ngModelChange)="onQueryChanged($event, rule)" required aria-describedby="lookbackHelp">
+          <input *ngIf="rule.type == 'number'" type="number" id="alertValue" class="form-control w-60px"
+            [(ngModel)]="rule.value" (ngModelChange)="onQueryChanged($event, rule)" required
+            aria-describedby="lookbackHelp">
+          <select *ngIf="rule.type == 'category'" id="alertMetaSelection" class="form-control w-60px" 
+          [(ngModel)]="rule.value"
+            (ngModelChange)="onQueryChanged($event, rule)" required id="fieldInput" aria-describedby="typeHelp">
+            <option *ngFor="let opt of rule.operators" [value]="opt">
+              {{ opt }}
+            </option>
+          </select>
+          <small id="lookbackHelp" class="form-text text-muted d-none">enter type.</small>
+        </div>
+
+      </ng-container>
 
     </query-builder>
 
