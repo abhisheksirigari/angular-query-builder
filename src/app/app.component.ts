@@ -46,30 +46,21 @@ export class AppComponent implements OnInit {
     this.modalRef.content.onClose.subscribe(result => {
       console.log('results', JSON.stringify(result));
       if (result) {
-        let successexpression = [];
-        Object.keys(result).forEach(res => {
-          
-          result['rules'].forEach(ele => {
-            let lookbackexp = '';
-            if(ele.fields && ele.fields.length > 0) {
-              ele['fields'].forEach(flds => {
-                lookbackexp += ',' + flds.value ;
-              });
-              successexpression.push(result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' + ' ' + lookbackexp);
-            } else {
-              successexpression.push(result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' + ' ');
-            }
-          });
-          let uniqueArr = successexpression.filter((v, i, a) => a.indexOf(v) === i);
-          this.successexpression = JSON.stringify(uniqueArr);
-          this.successexpression = this.successexpression.replace(/^.{2}/g, '{{');
-          this.successexpression = this.successexpression.replace(this.successexpression.charAt(this.successexpression.length-1), '"}}');
-          this.successexpression = this.successexpression.replace(this.successexpression.charAt(1), '"}}');
-          this.successexpression = this.successexpression.replace( /and/g , 'AND');
-          this.successexpression = this.successexpression.replace( /or/g , 'OR');
-          // JSON.stringify(successexpression.filter((v, i, a) => a.indexOf(v) === i));
-        });
-        
+        let successexpression = this.expressionFormat(result, []);
+
+        let uniqueArr = successexpression.filter((v, i, a) => a.indexOf(v) === i);
+        this.successexpression = '{{' + uniqueArr.join('') + '}}';
+        // this.successexpression = JSON.stringify(uniqueArr);
+
+        // this.successexpression = this.successexpression.replace(/^.{2}/g, '{{');
+
+        let searchstr = 'and';
+        let index = this.successexpression.indexOf('and');
+        this.successexpression = this.successexpression.slice(0, index) + this.successexpression.slice(index + searchstr.length);
+
+        this.successexpression = this.successexpression.replace(/and/g, 'AND');
+        this.successexpression = this.successexpression.replace(/or/g, 'OR');
+
         setTimeout(() => {
           this.toastr.success('The Sample' + this.operationName + ' has been successfully completed!', '', {
             timeOut: 3000
@@ -79,9 +70,35 @@ export class AppComponent implements OnInit {
     });
   }
 
+  expressionFormat(result: any, successexpression: any) {
+    if (result) {
+
+      if (result['rules'].length > 0) {
+        result['rules'].forEach(ele => {
+          let lookbackexp = '';
+          if (ele['condition'] && ele['rules'].length > 0) {
+            this.expressionFormat(ele, successexpression);
+          } else { 
+            if (ele.fields && ele.fields.length > 0) {
+              ele['fields'].forEach(flds => {
+                lookbackexp += ',' + flds.value;
+              });
+              successexpression.push(result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' + ' ' + lookbackexp);            
+            } else {
+              successexpression.push(result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' + ' ');
+            }
+          }
+        });
+      }
+
+      return successexpression;
+    }
+
+  }
+
   save() {
     this.submitted = true;
-  
+
     // stop here if form is invalid
     if (this.querybuilderForm.invalid) {
       return;
