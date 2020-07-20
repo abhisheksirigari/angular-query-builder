@@ -2,20 +2,20 @@
 <div class="toolbar" role="banner">
   <img width="40" alt="Angular Logo"
     src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==" />
-  <span>Angular Query Builder</span>
+  <span>Query builder App</span>
   <div class="spacer"></div>  
 </div>
 
-<div class="content" role="main">
+<div class="container-fluid main-content" role="main">
 
   <div class="modal-content">
     <div class="modal-header">
       <h5 class="modal-title w-100">
-        Create new Container
-        <button type="button" class="btn btn-primary btn-sm float-right" (click)="refresh()">Refresh</button>
+        Create new container
+        <button type="button" class="btn btn-outline-primary btn-sm float-right" (click)="refresh()">Refresh</button>
       </h5>
     </div>
-    <div class="modal-body">
+    <div class="modal-body querybuilder">
       <div class="card-body">
 
         <form [formGroup]="querybuilderForm" (ngSubmit)="save()">
@@ -41,11 +41,11 @@
             <div class="col-12">
               <div class="form-group">
                 <label for="successexpressionInput">Success logical expression</label>
-                <button class="btn btn-primary float-right btn-sm" (click)="openConditionbuilder()">Condition
-                  builder</button>
-
+                <button class="btn btn-primary float-right btn-sm" (click)="openConditionbuilder()">
+                  Condition builder
+                </button>
                 <textarea [(ngModel)]="successexpression" class="form-control mt-1" id="successexpressionInput" rows="3"
-                  placeholder="success(command_operation_1)and failure(command_operation_2)"
+                  placeholder="success(command_operation_1) AND failure(command_operation_3)"
                   aria-describedby="successexpressionHelp" formControlName="expression">
               </textarea>
                 <small id="successexpressionHelp" class="form-text text-muted d-none">Success logical
@@ -59,26 +59,17 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary">Cancel</button>
-      <button [disabled]="querybuilderForm.invalid" type="submit" class="btn btn-primary" (click)="save()">Save</button>
+      <button type="button" class="btn btn-outline-primary btn-sm">Cancel</button>
+      <button [disabled]="querybuilderForm.invalid" type="submit" class="btn btn-outline-primary btn-sm" 
+      [ngClass]="{'btn-disabled' : querybuilderForm.invalid}"
+      (click)="save()">Save</button>
     </div>
   </div>
 
-
-
-
-
-
-  <!-- Footer -->
-  <footer>
-    Query builder
-  </footer>
-
-
 </div>
 
-<nav class="navbar navbar-expand navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">@2020. All rights reserved</a>
+<nav class="navbar navbar-expand">
+  <a class="navbar-brand" href="#">© 2020 CA. All right</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -88,7 +79,7 @@
       <li class="nav-item active">
         <a class="nav-link" href="#">About</a>
       </li>
-      <li>|</li>
+      <li class="spacer">|</li>
       <li class="nav-item">
         <a class="nav-link" href="#">Help</a>
       </li>

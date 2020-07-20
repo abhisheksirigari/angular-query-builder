@@ -1,15 +1,36 @@
+.modal-title {
+    font-size: 18px;
+}
+
 .logical-exp {
     white-space: pre-wrap;
-    height: 100px;
-    overflow: scroll;
+    height: 97px;
+    overflow-y: scroll;
+    overflow-x: hidden;
     border: 1px solid #ddd;
-    background: #ccc;
+    background: #EBEFF5;
     margin-bottom: 20px;
+    padding: 10px;
+    line-height: 1.5;
+    border-radius: .2rem;
+}
+
+.card-body {
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #dde3ed;
+    border-radius: 0.3rem;
+    outline: 0;
 }
 
 .querybuilder {
     min-height: 200px;
     height: auto;
+}
+
+.collpase-icon {
+    width: 12px;
 }
 
 .form-control {
@@ -19,7 +40,7 @@
 
 .form-col {
     display: inline-block;
-    width: 20%;
+    width: 23%;
 
     &.form-col-inner {
         width: 80px;
@@ -33,3 +54,10 @@
     width: 60px;
 }
 
+.divider {
+    height: 10px;
+}
+
+.q-button .q-remove-button {
+    display: none;
+}

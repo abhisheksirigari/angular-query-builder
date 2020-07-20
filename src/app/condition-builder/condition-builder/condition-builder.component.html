@@ -8,6 +8,7 @@
 
   <div class="row">
     <div class="col-12">
+      <label>logical expression for Success</label>
       <div class="logical-exp">
         <app-query [query]="query"></app-query>
       </div>
@@ -19,108 +20,139 @@
   </div>
 
   <div class="querybuilder" ngNoForm>
-    <query-builder id="triggerQuery" [(ngModel)]="query" [config]="config" [allowRuleset]="allowRuleset"
-      [allowCollapse]="allowCollapse">
-      <ng-container
-        *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
-        <div class="btn-group" style="margin-left: 50px;">
-          <button class="btn btn-outline-primary btn-sm" (click)="addRule()">Add condition</button>
-          <button class="btn btn-outline-primary btn-sm" (click)="addRuleSet()">Add Group</button>
-          <button class="btn btn-outline-primary btn-sm" (click)="removeRuleSet()" *ngIf="removeRuleSet">
-            Delete</button>
-        </div>
-      </ng-container>
-      <ng-container *queryRemoveButton="let rule; let removeRule=removeRule">
-        <button class="btn btn-outline-primary btn-sm" (click)="$event.preventDefault();removeRule(rule)">
-          <i class="fa fa-trash" aria-hidden="true"></i></button>
-      </ng-container>
+    <label>Condition builder for success</label>
+    <div class="card-body">
 
-      <ng-container *queryField="let rule; let fields=fields; let changeField=changeField">
-        <!-- {{rule | json}} -->
+      <query-builder id="triggerQuery" [(ngModel)]="query" [config]="config" [allowRuleset]="allowRuleset"
+        [allowCollapse]="allowCollapse"  [formControl]="queryCtrl">
+        <ng-container *queryArrowIcon>
+          <img class="collpase-icon" src="assets/images/collapse.png" (click)="onItemChange(query)">
+        </ng-container>
 
-        <div class="form-col">
-          <label for="typeInput">Type</label><br>
-          <select class="form-control" [(ngModel)]="rule.subtype" required id="subtypeInput"
-            aria-describedby="subtypeHelp">
-            <option value="statusdependency" selected>Status dependency</option>
-            <option value="exitcodedependency">Exit Code dependency</option>
-          </select>
-          <small id="subtypeHelp" class="form-text text-muted d-none">enter subtypeHelp.</small>
+        <ng-container *querySwitchGroup="let rule; let ruleset">
+          <div *ngIf="ruleset" class="btn-group btn-group-toggle" data-toggle="buttons" aria-label="condition">
+            <label class="btn btn-outline-primary btn-sm" [ngClass]="{'active': ruleset.condition == 'and'}">
+              <input type="radio" [(ngModel)]="ruleset.condition" name="options" id="option1" autocomplete="off"
+                value="and"> And
+            </label>
+            <label class="btn btn-outline-primary btn-sm" [ngClass]="{'active': ruleset.condition == 'or'}">
+              <input type="radio" [(ngModel)]="ruleset.condition" name="options" id="option3" autocomplete="off"
+                value="or"> Or
+            </label>
+          </div>
+          <span *ngIf="ruleset.isCollapsed">
+            <app-query [query]="query"></app-query>
+          </span>
 
-        </div>
-        <div class="form-col">
-          <label for="typeInput">Subtype</label><br>
-          <select id="alertMetaSelection" class="form-control" [(ngModel)]="rule.field"
-            (ngModelChange)="onQueryChanged($event, rule)" required id="fieldInput" aria-describedby="typeHelp">
-            <option *ngFor="let field of fields" [ngValue]="field.value">
-              {{field.name}}
-            </option>
-          </select>
-          <small id="fieldInput" class="form-text text-muted d-none">enter type.</small>
-        </div>
+        </ng-container>
 
+        <ng-container
+          *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
+          <div class="btns">
+            <button class="btn btn-outline-primary btn-sm" (click)="addRule()">Add condition</button>
+            <button class="btn btn-outline-primary btn-sm ml-2 mr-2" (click)="addRuleSet()">Add group</button>
+            <button class="btn btn-link btn-sm" (click)="$event.preventDefault();removeRuleSet()"
+              [disabled]="!removeRuleSet">
+              Delete</button>
+          </div>
+        </ng-container>
+        <ng-container *queryRemoveButton="let rule; let ruleset; let removeRule=removeRule; let addRule=addRule;">
+          <br>
+          <div class="btns">
+            <button class="btn btn-outline-primary btn-sm" (click)="$event.preventDefault();removeRule(rule)">
+              <i class="fa fa-trash" aria-hidden="true"></i></button>
+            <button class="btn btn-outline-primary btn-sm ml-2" (click)="$event.preventDefault();addNewRule(query)">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+        </ng-container>
 
+        <ng-container *queryField="let rule; let fields=fields; let changeField=changeField">
+          <div class="form-col">
+            <label for="typeInput">Type</label><br>
+            <select class="form-control" [(ngModel)]="rule.subtype" required id="typeInput" aria-describedby="typeHelp">
+              <option value="statusdependency" selected>Status dependency</option>
+              <option value="exitcodedependency">Exit code dependency</option>
+            </select>
+            <small id="typeHelp" class="form-text text-muted d-none">enter type</small>
 
-
-
-      </ng-container>
-
-      <ng-container *queryOperator="let rule; let operators=operators">
-        <div class="form-col">
-          <label for="typeInput">status</label><br>
-          <select id="alertOperatorSelection" class="form-control" [(ngModel)]="rule.operator"
-            [ngClass]="{'exitcode': isexitcode}" (ngModelChange)="onQueryChanged($event, rule)" required
-            aria-describedby="statusHelp">
-            <option *ngFor="let value of operators" [ngValue]="value">
-              {{value}}
-            </option>
-          </select>
-          <small id="statusHelp" class="form-text text-muted d-none">enter status</small>
-        </div>
-      </ng-container>
-
-      <ng-container *queryInput="let rule; type: 'string'">
-
-        <div class="form-col">
-          <label for="typeInput">operation names</label><br>
-          <input type="text" id="alertValue" class="form-control" [(ngModel)]="rule.value"
-            (ngModelChange)="onQueryChanged($event, rule)" required>
-        </div>
-      </ng-container>
-
-      <ng-container *queryInput="let rule; let fields=fields; let field=field; let options=options; type: 'category'">
-        
-        <div class="form-col">
-          <label for="typeInput">operation name</label><br>
-          <select [(ngModel)]="rule.value" class="form-control" (ngModelChange)="onQueryChanged($event, rule)">
-            <option *ngFor="let opt of options" [value]="opt.value">
-              {{ opt.name }}
-            </option>
-          </select>
-        </div>
-        <br *ngIf="isAddFields">
-        <div class="form-col form-col-inner" *ngFor="let rule of rule.fields;">
-          <label for="typeInput">{{rule.name}}</label><br>
-          <input *ngIf="rule.type == 'string'" type="text" id="alertValue" class="form-control w-60px" [(ngModel)]="rule.value"
-            (ngModelChange)="onQueryChanged($event, rule)" required aria-describedby="lookbackHelp">
-          <input *ngIf="rule.type == 'number'" type="number" id="alertValue" class="form-control w-60px"
-            [(ngModel)]="rule.value" (ngModelChange)="onQueryChanged($event, rule)" required
-            aria-describedby="lookbackHelp">
-          <select *ngIf="rule.type == 'category'" id="alertMetaSelection" class="form-control w-60px" 
-          [(ngModel)]="rule.value"
-            (ngModelChange)="onQueryChanged($event, rule)" required id="fieldInput" aria-describedby="typeHelp">
-            <option *ngFor="let opt of rule.operators" [value]="opt">
-              {{ opt }}
-            </option>
-          </select>
-          <small id="lookbackHelp" class="form-text text-muted d-none">enter type.</small>
-        </div>
-
-      </ng-container>
-
-    </query-builder>
+          </div>
+          <div class="form-col">
+            <label for="subtypeInput">Sub type</label><br>
+            <select id="subtypeInput" class="form-control" [(ngModel)]="rule.field"
+              (ngModelChange)="onQueryChanged($event, rule, 'subtype')" required aria-describedby="subtypeHelp">
+              <option *ngFor="let field of fields" [ngValue]="field.value">
+                {{field.name}}
+              </option>
+            </select>
+            <small id="subtypeHelp" class="form-text text-muted d-none">enter sub type</small>
+          </div>
 
 
+        </ng-container>
+
+        <ng-container *queryOperator="let rule; let operators=operators">
+          <div class="form-col">
+            <label for="statusInput">Status</label><br>
+            <select id="statusInput" class="form-control" [(ngModel)]="rule.operator"
+              [ngClass]="{'exitcode': rule.isexitcode}" (ngModelChange)="onQueryChanged($event, rule, 'status')" required
+              aria-describedby="statusHelp">
+              <option *ngFor="let value of operators" [ngValue]="value">
+                {{value}}
+              </option>
+            </select>
+            <small id="statusHelp" class="form-text text-muted d-none">enter status</small>
+          </div>
+        </ng-container>
+
+        <ng-container *queryInput="let rule; type: 'string'">
+          <div class="form-col">
+            <label for="operationhhInput">Operation name</label><br>
+            <input type="text" id="operationhhInput" class="form-control" [(ngModel)]="rule.value"
+              aria-describedby="operationtextHelp" required>
+            <small id="operationtextHelp" class="form-text text-muted d-none">enter Operation value</small>
+          </div>
+        </ng-container>
+
+        <ng-container *queryInput="let rule; let fields=fields; let field=field; let options=options; type: 'category'">
+          <div class="form-col">
+            <label for="operatiommInput">Operation name</label><br>
+            <select id="operatiommInput" [(ngModel)]="rule.value" class="form-control"
+              aria-describedby="operationnameHelp">
+              <option *ngFor="let opt of options" [value]="opt.value">
+                {{ opt.name }}
+              </option>
+            </select>
+            <small id="operationnameHelp" class="form-text text-muted d-none">enter Operation name</small>
+          </div>
+          <div class="w-100 divider" *ngIf="rule.isAddFields">&nbsp;</div>
+          <div class="form-col form-col-inner" *ngFor="let rule of rule.fields;">
+            <label for="typeInput">{{rule.name}}</label><br>
+            <input *ngIf="rule.type == 'string'" type="text" id="alertValue" class="form-control w-60px"
+              [(ngModel)]="rule.value" required
+              aria-describedby="lookbackoptionsHelp">
+            <input *ngIf="rule.type == 'number'" type="number" id="alertValue" class="form-control w-60px"
+              [(ngModel)]="rule.value" required
+              aria-describedby="lookbackoptionsHelp">
+            <select *ngIf="rule.type == 'category'" id="alertMetaSelection" class="form-control w-60px"
+              [(ngModel)]="rule.value" required aria-describedby="lookbackoptionsHelp">
+              <option *ngFor="let opt of rule.operators" [value]="opt">
+                {{ opt }}
+              </option>
+            </select>
+            <small id="lookbackoptionsHelp" class="form-text text-muted d-none">enter look back options</small>
+          </div>
+
+
+
+        </ng-container>
+
+      </query-builder>
+
+
+
+
+    </div>
 
     <!-- <query-builder [(ngModel)]='query' [config]='currentConfig' [allowRuleset]='allowRuleset'
       [allowCollapse]='allowCollapse'>
@@ -141,8 +173,14 @@
     </query-builder> -->
   </div>
 
+  <p>Form Valid: {{queryCtrl.valid}}</p>
+  <p>Form Touched: {{queryCtrl.touched}}</p>
+  <p>Errors:</p>
+  <textarea readonly="">{{queryCtrl.errors | json}}</textarea>
+
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" (click)="onConfirm()">Save</button>
-  <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+  <button type="button" class="btn btn-outline-primary btn-sm" (click)="checkValid()">Validity</button>
+  <button type="button" class="btn btn-outline-primary btn-sm" (click)="onCancel()">Cancel</button>
+  <button type="button" class="btn btn-outline-primary btn-sm" (click)="onConfirm()">Save</button>
 </div>

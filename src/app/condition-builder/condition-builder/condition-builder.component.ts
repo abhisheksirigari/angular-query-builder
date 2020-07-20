@@ -12,6 +12,8 @@ import { FormControl, FormBuilder } from '@angular/forms';
 export class ConditionBuilderComponent implements OnInit {
   public onClose: Subject<any>;
   logicalexpression: any;
+  public query = {};
+  modalData: any;
 
   objectKeys = Object.keys;
   public queryCtrl: FormControl;
@@ -19,15 +21,7 @@ export class ConditionBuilderComponent implements OnInit {
   public allowRuleset: boolean = true;
   public allowCollapse: boolean = true;
   isexitcode = false;
-  isAddFields = false;
-
-  public query = {
-    condition: 'and',
-    rules: [
-      { subtype: "statusdependency", field: "none", operator: "success", value: "sample_oprA", fields: [] }
-    ]
-  };
-
+  
   queryArray = Object.keys(this.query).map(q => this.query[q]);
 
   public config: QueryBuilderConfig = {
@@ -35,16 +29,16 @@ export class ConditionBuilderComponent implements OnInit {
       none: {
         name: 'None',
         type: 'category',
-        operators: ['success', 'failure', 'exitcode', 'notrunning', 'terminated'],
+        operators: ['', 'Done', 'Exit code', 'Failure', 'Not running', 'Success', 'Terminated'],
         options: [
           { name: 'sample_oprA', value: 'sample_oprA' },
           { name: 'sample_oprB', value: 'sample_oprB' }
         ]
       },
       lookback: {
-        name: 'Lookback',
+        name: 'Look-back',
         type: 'category',
-        operators: ['success', 'failure', 'exitcode', 'notrunning', 'terminated'],
+        operators: ['', 'Done', 'Exit code', 'Failure', 'Not running', 'Success', 'Terminated'],
         options: [
           { name: 'sample_oprA', value: 'sample_oprA' },
           { name: 'sample_oprB', value: 'sample_oprB' }
@@ -62,7 +56,12 @@ export class ConditionBuilderComponent implements OnInit {
 
   ngOnInit() {
     this.onClose = new Subject();
+    this.query = this.modalData;
     this.logicalexpression = JSON.stringify(this.query);
+  }
+
+  checkValid() {
+    this.queryCtrl.updateValueAndValidity();
   }
 
   onConfirm() {
@@ -75,56 +74,65 @@ export class ConditionBuilderComponent implements OnInit {
     this._bsModalRef.hide();
   }
 
-  onQueryChanged(e: any, rule: any) {
+  onItemChange(query: any) {
+    query.isCollapsed = !query.isCollapsed;
+    console.log(query);
+  }
+
+  onQueryChanged(e: any, rule: any, field: any) {
     console.log(e, rule);
-    this.isexitcode = rule.operator === 'exitcode' ? !this.isexitcode : false;
-    if (rule.field == 'lookback' && rule.operator == 'failure') {
-      this.isAddFields = true;
-      rule.fields = [
-        {
-          name: 'Look back',
-          field: 'lookback',
-          type: 'number',
-          value: '01'
-        },
-        {
-          name: '',
-          field: 'lookbackmm',
-          type: 'number',
-          value: '00'
-        }
-      ] 
+    rule.isexitcode = (rule.operator === 'Exit code') ? true : false;
+    if ((field == 'subtype' || field == 'status') && (rule.operator == 'Done' || rule.operator == 'Not running' || rule.operator == 'Success' || rule.operator == 'Terminated') ) {
+      if (rule.fields) {
+        rule.fields.length = 0;
+      }
     }
-    if (rule.field == 'lookback' && rule.operator == 'exitcode') {
-      this.isAddFields = true;
-      rule.fields = [
-        {
-          name: 'Operator',
-          field: 'operator',
-          type: 'category',
-          operators: ['=', '<=', '>', '>='],
-          value: ''
-        },
-        {
-          name: 'Value',
-          field: 'value',
-          type: 'string',
-          value: '4'
-        },
-        {
-          name: 'Look back',
-          field: 'lookback',
-          type: 'number',
-          value: '20'
-        },
-        {
-          name: '',
-          field: 'lookbackmm',
-          type: 'number',
-          value: '01'
-        }
-      ] 
+    if (field == 'subtype' && rule.operator == 'Failure' ) {
+      if (rule.fields) {
+        rule.fields.length = 0;
+      }
+    }    
+    if (rule.field == 'lookback' && (field == 'subtype' || field == 'status') ) {
+      rule.isAddFields = true;
+
+      if (rule.isAddFields && (rule.operator == '' || rule.operator == 'Failure')) {
+        rule.fields = [
+          {
+            name: 'Look back',
+            field: 'lookback',
+            type: 'number',
+            value: ''
+          },
+          {
+            name: '',
+            field: 'lookbackmm',
+            type: 'number',
+            value: ''
+          }
+        ];
+      }      
+      
+      if (rule.isAddFields && rule.operator == 'Exit code') {
+        rule.fields.unshift(
+          {
+            name: 'Operator',
+            field: 'operator',
+            type: 'category',
+            operators: ['=', '<=', '>', '>='],
+            value: ''
+          },
+          {
+            name: 'Value',
+            field: 'value',
+            type: 'string',
+            value: ''
+          }
+        );        
+      }
+    } else {
+      rule.isAddFields = false;
     }
+
 
     // const control = this.parentFormGroup.controls['triggerQuery'];
     // if (rule.field && rule.operator && rule.value) {
@@ -134,6 +142,17 @@ export class ConditionBuilderComponent implements OnInit {
     // else {
     //   control.setErrors({ 'required': true });
     // }
+  }
+
+  addNewRule(query: any) {
+    console.log(this.config);    
+    query.rules.push(
+      { subtype: 'statusdependency', field: 'none', operator: 'Success', value: 'sample_oprA', fields: [] }
+    );
+  }
+
+  removeRuleSet() {
+
   }
 
 }

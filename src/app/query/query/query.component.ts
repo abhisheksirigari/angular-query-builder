@@ -12,9 +12,14 @@ export interface Query {
 })
 export class QueryComponent implements OnInit {
   @Input() query: Query;
+
+  ruleSet: any;
+
   objectKeys = Object.keys;
 
-  constructor() { }
+  constructor() {
+    this.ruleSet = this.query;
+   }
 
   ngOnInit() {
   }

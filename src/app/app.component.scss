@@ -1,25 +1,47 @@
 .navbar-brand {
   font-size: 12px;
+  color: #58606e;
+  font-weight: 400;
 }
+
+.spacer {
+  line-height: 2.5;
+}
+
+.btn-outline-primary.disabled, .btn-outline-primary:disabled {
+  color: #AFBACC;
+  background-color: transparent;
+  border-color: #AFBACC;
+}
+
+.querybuilder .card-body {
+  pointer-events: auto;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #DDE3ED;
+  border-radius: .3rem;
+  outline: 0;
+}
+
 
 /* TOASTR BUGFIX */
 #toast-container > div {
-    opacity: 1;
-  }
-  .toast {
-    font-size: initial !important;
-    border: initial !important;
-    backdrop-filter: blur(0) !important;
-  }
-  .toast-success {
-    background-color: #51A351 !important;
-  }
-  .toast-error {
-    background-color: #BD362F !important;
-  }
-  .toast-info {
-    background-color: #2F96B4 !important;
-  }
-  .toast-warning {
-    background-color: #F89406 !important;
-  }
+  opacity: 1;
+}
+.toast {
+  font-size: initial !important;
+  border: initial !important;
+  backdrop-filter: blur(0) !important;
+}
+.toast-success {
+  background-color: #51a351 !important;
+}
+.toast-error {
+  background-color: #bd362f !important;
+}
+.toast-info {
+  background-color: #2f96b4 !important;
+}
+.toast-warning {
+  background-color: #f89406 !important;
+}

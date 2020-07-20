@@ -13,6 +13,13 @@ export class AppComponent implements OnInit {
   title = 'querybuilder-app';
   operationName: string = "SAMPLE_OPERATION_type";
   successexpression = '';
+  modalData = {
+    condition: 'and',
+    rules: [
+      {"field":"lookback","operator":"Success","value":"sample_oprB","subtype":"statusdependency","isexitcode":false,"isAddFields":true,"fields":[]},{"field":"lookback","operator":"Failure","value":"sample_oprA","subtype":"statusdependency","isexitcode":false,"isAddFields":true,"fields":[{"name":"Look back","field":"lookback","type":"number","value":2},{"name":"","field":"lookbackmm","type":"number","value":3}]},{"field":"lookback","operator":"Exit code","value":"sample_oprB","subtype":"statusdependency","isexitcode":true,"isAddFields":true,"fields":[{"name":"Operator","field":"operator","type":"category","operators":["=","<=",">",">="],"value":">="},{"name":"Value","field":"value","type":"string","value":"20"},{"name":"Look back","field":"lookback","type":"number","value":4},{"name":"","field":"lookbackmm","type":"number","value":5}]},{"condition":"or","rules":[{"field":"lookback","operator":"Exit code","value":"sample_oprA","subtype":"exitcodedependency","isexitcode":true,"isAddFields":true,"fields":[{"name":"Operator","field":"operator","type":"category","operators":["=","<=",">",">="],"value":"="},{"name":"Value","field":"value","type":"string","value":"30"},{"name":"Look back","field":"lookback","type":"number","value":6},{"name":"","field":"lookbackmm","type":"number","value":7}]}]}
+    ]
+  };
+  // { subtype: 'statusdependency', field: 'none', operator: 'Success', value: 'sample_oprA', fields: [] }
 
   querybuilderForm: FormGroup;
   submitted = false;
@@ -38,7 +45,13 @@ export class AppComponent implements OnInit {
 
   openConditionbuilder() {
     this.successexpression = '';
+    const initialState = {
+      modalData: this.modalData
+    };
     this.modalRef = this.modalService.show(ConditionBuilderComponent, {
+      initialState,
+      backdrop: "static",
+      keyboard: false,
       ariaDescribedby: 'condition builder',
       ariaLabelledBy: 'Condition Builder',
       class: 'modal-lg'
@@ -46,13 +59,12 @@ export class AppComponent implements OnInit {
     this.modalRef.content.onClose.subscribe(result => {
       console.log('results', JSON.stringify(result));
       if (result) {
-        let successexpression = this.expressionFormat(result, []);
+        this.modalData = result;
+        let successexpression = this.expressionFormat(result, '', result['rules'].length);
+        this.successexpression = '{{' + successexpression + '}}';
 
-        let uniqueArr = successexpression.filter((v, i, a) => a.indexOf(v) === i);
-        this.successexpression = '{{' + uniqueArr.join('') + '}}';
-        // this.successexpression = JSON.stringify(uniqueArr);
-
-        // this.successexpression = this.successexpression.replace(/^.{2}/g, '{{');
+        // let uniqueArr = successexpression.filter((v, i, a) => a.indexOf(v) === i);
+        // this.successexpression = '{{' + uniqueArr.join('') + '}}';
 
         let searchstr = 'and';
         let index = this.successexpression.indexOf('and');
@@ -70,30 +82,50 @@ export class AppComponent implements OnInit {
     });
   }
 
-  expressionFormat(result: any, successexpression: any) {
-    if (result) {
+  expressionFormat(result: any, successexpression: any, currentloop: any) {
 
-      if (result['rules'].length > 0) {
-        result['rules'].forEach(ele => {
-          let lookbackexp = '';
-          if (ele['condition'] && ele['rules'].length > 0) {
-            this.expressionFormat(ele, successexpression);
-          } else { 
-            if (ele.fields && ele.fields.length > 0) {
-              ele['fields'].forEach(flds => {
-                lookbackexp += ',' + flds.value;
-              });
-              successexpression.push(result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' + ' ' + lookbackexp);            
-            } else {
-              successexpression.push(result['condition'] + ' ' + ele.operator + '(' + ele.value + ')' + ' ');
-            }
+    if (result['rules'].length > 0) {
+      
+      for(let idx =0; idx < currentloop; idx ++ ) {
+        let ele = result['rules'][idx];
+
+        if (ele['condition'] && ele['rules'].length > 0) {
+          this.expressionFormat(ele, successexpression, ele['rules'].length);
+        } else {
+          successexpression += '(' + ele.operator + '(' + ele.value;
+
+          if (ele.fields && ele.fields.length > 0) {
+            ele['fields'].forEach( (flds:any, sidx: any) => {
+              if (ele.field == 'lookback' || ele.field == 'lookbackmm') {
+                successexpression += ',' + flds.value;
+              }
+            });
+            successexpression += ')';            
           }
-        });
-      }
 
-      return successexpression;
+          if (ele.fields && ele.fields.length > 0) {
+            ele['fields'].forEach( (flds:any, sidx: any) => {
+              if (ele.field == 'operator' || ele.field == 'value') {
+                successexpression += flds.value;
+              }
+            });                       
+          }
+          successexpression += ')'; 
+        }
+
+        if(idx != (result.rules.length-1) || result.condition) {
+          if (!result.condition) {
+            successexpression += ' ' + result.condition;
+          }
+          if (result.condition) {
+            successexpression += ' ' + result.condition;
+          }
+        }
+
+      }
     }
 
+    return successexpression;
   }
 
   save() {
