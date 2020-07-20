@@ -24,12 +24,13 @@
     <div class="card-body">
 
       <query-builder id="triggerQuery" [(ngModel)]="query" [config]="config" [allowRuleset]="allowRuleset"
-        [allowCollapse]="allowCollapse"  [formControl]="queryCtrl">
-        <ng-container *queryArrowIcon>
-          <img class="collpase-icon" src="assets/images/collapse.png" (click)="onItemChange(query)">
+        [allowCollapse]="allowCollapse" [formControl]="queryCtrl">
+
+        <ng-container *queryArrowIcon="let rule; let ruleset; let fields=fields;">
+          <img class="collpase-icon" src="assets/images/collapse.png" (click)="onItemChange(rule)">
         </ng-container>
 
-        <ng-container *querySwitchGroup="let rule; let ruleset">
+        <ng-container *querySwitchGroup="let rule; let ruleset; let fields=fields;">
           <div *ngIf="ruleset" class="btn-group btn-group-toggle" data-toggle="buttons" aria-label="condition">
             <label class="btn btn-outline-primary btn-sm" [ngClass]="{'active': ruleset.condition == 'and'}">
               <input type="radio" [(ngModel)]="ruleset.condition" name="options" id="option1" autocomplete="off"
@@ -40,14 +41,13 @@
                 value="or"> Or
             </label>
           </div>
-          <span *ngIf="ruleset.isCollapsed">
-            <app-query [query]="query"></app-query>
-          </span>
+
+          <app-query *ngIf="rule.isCollapsed" [query]="rule"></app-query>
 
         </ng-container>
 
         <ng-container
-          *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
+          *queryButtonGroup="let rule; let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
           <div class="btns">
             <button class="btn btn-outline-primary btn-sm" (click)="addRule()">Add condition</button>
             <button class="btn btn-outline-primary btn-sm ml-2 mr-2" (click)="addRuleSet()">Add group</button>
@@ -95,8 +95,8 @@
           <div class="form-col">
             <label for="statusInput">Status</label><br>
             <select id="statusInput" class="form-control" [(ngModel)]="rule.operator"
-              [ngClass]="{'exitcode': rule.isexitcode}" (ngModelChange)="onQueryChanged($event, rule, 'status')" required
-              aria-describedby="statusHelp">
+              [ngClass]="{'exitcode': rule.isexitcode}" (ngModelChange)="onQueryChanged($event, rule, 'status')"
+              required aria-describedby="statusHelp">
               <option *ngFor="let value of operators" [ngValue]="value">
                 {{value}}
               </option>
@@ -125,56 +125,38 @@
             </select>
             <small id="operationnameHelp" class="form-text text-muted d-none">enter Operation name</small>
           </div>
-          <div class="w-100 divider" *ngIf="rule.isAddFields">&nbsp;</div>
+          <div class="w-100 divider" *ngIf="rule.isfields">&nbsp;</div>
           <div class="form-col form-col-inner" *ngFor="let rule of rule.fields;">
-            <label for="typeInput">{{rule.name}}</label><br>
-            <input *ngIf="rule.type == 'string'" type="text" id="alertValue" class="form-control w-60px"
-              [(ngModel)]="rule.value" required
-              aria-describedby="lookbackoptionsHelp">
-            <input *ngIf="rule.type == 'number'" type="number" id="alertValue" class="form-control w-60px"
-              [(ngModel)]="rule.value" required
-              aria-describedby="lookbackoptionsHelp">
-            <select *ngIf="rule.type == 'category'" id="alertMetaSelection" class="form-control w-60px"
-              [(ngModel)]="rule.value" required aria-describedby="lookbackoptionsHelp">
-              <option *ngFor="let opt of rule.operators" [value]="opt">
-                {{ opt }}
-              </option>
+            <label for="operatorInput">{{rule.name}}</label><br>
+            <input *ngIf="rule.type == 'string'" type="text" id="operatorInput" class="form-control w-60px"
+              [(ngModel)]="rule.value" required aria-describedby="operatorInputHelp">
+            <small id="operatorInput" class="form-text text-muted d-none">enter operator value options</small>
+
+            <input *ngIf="rule.type == 'number'" type="number" id="operatornumberInput" class="form-control w-60px"
+              [(ngModel)]="rule.value" required aria-describedby="operatornumberHelp"
+              (ngModelChange)="validateRule($event, rule)">            
+            <small id="operatornumberHelp" class="form-text text-muted d-none">enter operator number options</small>
+
+            <select *ngIf="rule.type == 'category'" id="operatorValue" class="form-control w-60px"
+              [(ngModel)]="rule.value" required aria-describedby="operatorValueHelp">
+              <option *ngFor="let opt of rule.operators" [value]="opt">{{ opt }}</option>
             </select>
-            <small id="lookbackoptionsHelp" class="form-text text-muted d-none">enter look back options</small>
+            <small id="operatorValueHelp" class="form-text text-muted d-none">enter look back options</small>
           </div>
-
-
-
+          <div>
+            <small class="text-danger" *ngIf="errorMsg != ''">{{errorMsg}}</small>          
+          </div>
         </ng-container>
 
       </query-builder>
 
-
-
-
     </div>
 
-    <!-- <query-builder [(ngModel)]='query' [config]='currentConfig' [allowRuleset]='allowRuleset'
-      [allowCollapse]='allowCollapse'>
-      <ng-container
-        *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
-        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addRule()">
-          Add condition</button>
-        <button type="button" class="btn btn-outline-primary btn-sm" *ngIf="addRuleSet" (click)="addRuleSet()">
-          Add Group
-        </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" *ngIf="removeRuleSet" (click)="removeRuleSet()">
-          Delete
-        </button>
-      </ng-container>
-      <ng-container *queryArrowIcon>
-        <i class="fa fa-arrow-right"></i>
-      </ng-container>
-    </query-builder> -->
   </div>
 
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-outline-primary btn-sm" (click)="onCancel()">Cancel</button>
-  <button (click)="onConfirm()" [disabled]="queryCtrl.invalid" type="button" class="btn btn-outline-primary btn-sm">Save</button>
+  <button (click)="onConfirm()" [disabled]="queryCtrl.invalid" type="button"
+    class="btn btn-outline-primary btn-sm">Save</button>
 </div>

@@ -19,8 +19,6 @@ export class AppComponent implements OnInit {
       
     ]
   };
-  // {"field":"lookback","operator":"Success","value":"sample_oprB","subtype":"statusdependency","isexitcode":false,"isAddFields":true,"fields":[]},{"field":"lookback","operator":"Failure","value":"sample_oprA","subtype":"statusdependency","isexitcode":false,"isAddFields":true,"fields":[{"name":"Look back","field":"lookback","type":"number","value":2},{"name":"","field":"lookbackmm","type":"number","value":3}]},{"field":"lookback","operator":"Exit code","value":"sample_oprB","subtype":"statusdependency","isexitcode":true,"isAddFields":true,"fields":[{"name":"Operator","field":"operator","type":"category","operators":["=","<=",">",">="],"value":">="},{"name":"Value","field":"value","type":"string","value":"20"},{"name":"Look back","field":"lookback","type":"number","value":4},{"name":"","field":"lookbackmm","type":"number","value":5}]},{"condition":"or","rules":[{"field":"lookback","operator":"Exit code","value":"sample_oprA","subtype":"exitcodedependency","isexitcode":true,"isAddFields":true,"fields":[{"name":"Operator","field":"operator","type":"category","operators":["=","<=",">",">="],"value":"="},{"name":"Value","field":"value","type":"string","value":"30"},{"name":"Look back","field":"lookback","type":"number","value":6},{"name":"","field":"lookbackmm","type":"number","value":7}]}]}
-  
 
   querybuilderForm: FormGroup;
   submitted = false;
@@ -61,6 +59,11 @@ export class AppComponent implements OnInit {
       if (result) {
         this.modalData = result;
         this.successexpression = '{{' + result['output'] + '}}';
+
+        this.successexpression = this.successexpression.replace('and  (  (   )  or', 'or');
+        this.successexpression = this.successexpression.replace('and  (  (   )  and', 'and');
+        this.successexpression = this.successexpression.replace('or  (  (   )  or', 'or');
+        this.successexpression = this.successexpression.replace('or  (  (   )  and', 'and');
 
         this.successexpression = this.successexpression.replace(/and/g, 'AND');
         this.successexpression = this.successexpression.replace(/or/g, 'OR');

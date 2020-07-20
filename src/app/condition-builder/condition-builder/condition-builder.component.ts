@@ -21,6 +21,7 @@ export class ConditionBuilderComponent implements OnInit {
   public allowRuleset: boolean = true;
   public allowCollapse: boolean = true;
   isexitcode = false;
+  errorMsg = '';
 
   queryArray = Object.keys(this.query).map(q => this.query[q]);
 
@@ -103,45 +104,147 @@ export class ConditionBuilderComponent implements OnInit {
         rule.fields.length = 0;
       }
     }
+    if (field == 'subtype' && rule.field == 'none') {
+      if (rule.fields) {
+        rule.fields.length = 0;
+      }
+    }
     if (rule.field == 'lookback' && (field == 'subtype' || field == 'status')) {
-      rule.isAddFields = true;
+      rule.isfields = true;
 
-      if (rule.isAddFields && (rule.operator == '' || rule.operator == 'Failure')) {
+      if (rule.isfields && (rule.operator == '' || rule.operator == 'Failure' || rule.operator == 'Exit code') ) {
         rule.fields = [
           {
             name: 'Look back',
             field: 'lookback',
             type: 'number',
-            value: ''
+            value: '',
+            min: 0,
+            max: 9999,
+            error: 'Look back hhhh not in range. should be 0-9999',
+            validator: (rule: any) => {
+              const isNumber = /^[0-9]*$/.test(rule.value);
+              if (!isNumber) {
+                return {
+                  number: {
+                    rule: rule,
+                    message: 'Look back hhhh must be a number!'
+                  }
+                }
+              } else {
+                const hhhh = +rule.value;
+                if (hhhh < 1) {
+                  return {
+                    min: {
+                      rule: rule,
+                      message: 'Look back hhhh must be > 0'
+                    }
+                  }
+                } else if (hhhh > 9999) {
+                  return {
+                    max: {
+                      rule: rule,
+                      message: 'Look back hhhh must be < 9999'
+                    }
+                  }
+                }
+              }
+              return null;
+            }
           },
           {
             name: '',
             field: 'lookbackmm',
             type: 'number',
-            value: ''
+            value: '',
+            min: 0,
+            max: 59,
+            error: 'Look back mm not in range. should be 0-59',
+            validator: (rule) => {
+              const isNumber = /^[0-9]*$/.test(rule.value);
+              if (!isNumber) {
+                return {
+                  number: {
+                    rule: rule,
+                    message: 'Look back mm must be a number!'
+                  }
+                }
+              } else {
+                const mm = +rule.value;
+                if (mm < 0) {
+                  return {
+                    min: {
+                      rule: rule,
+                      message: 'Look back mm must be > 0'
+                    }
+                  }
+                } else if (mm > 59) {
+                  return {
+                    max: {
+                      rule: rule,
+                      message: 'Look back mm must be < 59'
+                    }
+                  }
+                }
+              }
+              return null;
+            }
           }
         ];
       }
 
-      if (rule.isAddFields && rule.operator == 'Exit code') {
-        rule.fields.unshift(
-          {
-            name: 'Operator',
-            field: 'operator',
-            type: 'category',
-            operators: ['=', '<=', '>', '>='],
-            value: ''
-          },
-          {
-            name: 'Value',
-            field: 'value',
-            type: 'string',
-            value: ''
-          }
-        );
+      if (rule.isfields && rule.operator == 'Exit code' && rule.operator != 'Failure') {
+        if (rule.fields.length == 0 || rule.fields.length < 3 ) {
+          rule.fields.unshift(
+            {
+              name: 'Operator',
+              field: 'operator',
+              type: 'category',
+              operators: ['=', '<=', '>', '>='],
+              value: ''
+            },
+            {
+              name: 'Value',
+              field: 'value',
+              type: 'string',
+              value: '',
+              min: 0,
+              max: 6,
+              validator: (rule) => {
+                const isNumber = /^[0-9]*$/.test(rule.value);
+                if (!isNumber) {
+                  return {
+                    number: {
+                      rule: rule,
+                      message: 'Look back value must be a number!'
+                    }
+                  }
+                } else {
+                  const age = +rule.value;
+                  if (age < 1) {
+                    return {
+                      min: {
+                        rule: rule,
+                        message: 'Look back value must be > 1'
+                      }
+                    }
+                  } else if (age > 9999) {
+                    return {
+                      max: {
+                        rule: rule,
+                        message: 'Look back value must be < 100'
+                      }
+                    }
+                  }
+                }
+                return null;
+              }
+            }
+          );
+        }
       }
     } else {
-      rule.isAddFields = false;
+      rule.isfields = false;
     }
 
 
@@ -155,10 +258,18 @@ export class ConditionBuilderComponent implements OnInit {
     // }
   }
 
+  validateRule(event: any, rule: any) {
+    if (rule.value < rule.min || rule.value > rule.max) {
+      this.errorMsg = rule.error;
+    } else {
+      this.errorMsg = '';
+    }
+  }
+
   addNewRule(query: any) {
     console.log(this.config);
     query.rules.push(
-      { subtype: 'statusdependency', field: 'none', operator: 'Success', value: 'sample_oprA', fields: [] }
+      { subtype: '', field: '', operator: '', value: '', fields: [] }
     );
   }
 
