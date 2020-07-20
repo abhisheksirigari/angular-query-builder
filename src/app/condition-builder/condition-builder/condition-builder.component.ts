@@ -21,7 +21,7 @@ export class ConditionBuilderComponent implements OnInit {
   public allowRuleset: boolean = true;
   public allowCollapse: boolean = true;
   isexitcode = false;
-  
+
   queryArray = Object.keys(this.query).map(q => this.query[q]);
 
   public config: QueryBuilderConfig = {
@@ -57,6 +57,7 @@ export class ConditionBuilderComponent implements OnInit {
   ngOnInit() {
     this.onClose = new Subject();
     this.query = this.modalData;
+    this.query['output'] = '';
     this.logicalexpression = JSON.stringify(this.query);
   }
 
@@ -65,6 +66,16 @@ export class ConditionBuilderComponent implements OnInit {
   }
 
   onConfirm() {
+    let root = document.getElementById('logicalexp');
+    let iter = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+    let textnode: any;
+
+    // print all text nodes
+    while (textnode = iter.nextNode()) {
+      console.log(textnode.textContent);
+      this.query['output'] += textnode.textContent;
+    }
+
     this.onClose.next(this.query);
     this._bsModalRef.hide();
   }
@@ -82,17 +93,17 @@ export class ConditionBuilderComponent implements OnInit {
   onQueryChanged(e: any, rule: any, field: any) {
     console.log(e, rule);
     rule.isexitcode = (rule.operator === 'Exit code') ? true : false;
-    if ((field == 'subtype' || field == 'status') && (rule.operator == 'Done' || rule.operator == 'Not running' || rule.operator == 'Success' || rule.operator == 'Terminated') ) {
+    if ((field == 'subtype' || field == 'status') && (rule.operator == 'Done' || rule.operator == 'Not running' || rule.operator == 'Success' || rule.operator == 'Terminated')) {
       if (rule.fields) {
         rule.fields.length = 0;
       }
     }
-    if (field == 'subtype' && rule.operator == 'Failure' ) {
+    if (field == 'subtype' && rule.operator == 'Failure') {
       if (rule.fields) {
         rule.fields.length = 0;
       }
-    }    
-    if (rule.field == 'lookback' && (field == 'subtype' || field == 'status') ) {
+    }
+    if (rule.field == 'lookback' && (field == 'subtype' || field == 'status')) {
       rule.isAddFields = true;
 
       if (rule.isAddFields && (rule.operator == '' || rule.operator == 'Failure')) {
@@ -110,8 +121,8 @@ export class ConditionBuilderComponent implements OnInit {
             value: ''
           }
         ];
-      }      
-      
+      }
+
       if (rule.isAddFields && rule.operator == 'Exit code') {
         rule.fields.unshift(
           {
@@ -127,7 +138,7 @@ export class ConditionBuilderComponent implements OnInit {
             type: 'string',
             value: ''
           }
-        );        
+        );
       }
     } else {
       rule.isAddFields = false;
@@ -145,7 +156,7 @@ export class ConditionBuilderComponent implements OnInit {
   }
 
   addNewRule(query: any) {
-    console.log(this.config);    
+    console.log(this.config);
     query.rules.push(
       { subtype: 'statusdependency', field: 'none', operator: 'Success', value: 'sample_oprA', fields: [] }
     );

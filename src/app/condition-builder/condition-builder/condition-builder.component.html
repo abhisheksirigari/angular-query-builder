@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-12">
       <label>logical expression for Success</label>
-      <div class="logical-exp">
+      <div id="logicalexp" class="logical-exp">
         <app-query [query]="query"></app-query>
       </div>
       <!-- <div class="form-group">
@@ -173,14 +173,8 @@
     </query-builder> -->
   </div>
 
-  <p>Form Valid: {{queryCtrl.valid}}</p>
-  <p>Form Touched: {{queryCtrl.touched}}</p>
-  <p>Errors:</p>
-  <textarea readonly="">{{queryCtrl.errors | json}}</textarea>
-
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-primary btn-sm" (click)="checkValid()">Validity</button>
   <button type="button" class="btn btn-outline-primary btn-sm" (click)="onCancel()">Cancel</button>
-  <button type="button" class="btn btn-outline-primary btn-sm" (click)="onConfirm()">Save</button>
+  <button (click)="onConfirm()" [disabled]="queryCtrl.invalid" type="button" class="btn btn-outline-primary btn-sm">Save</button>
 </div>
